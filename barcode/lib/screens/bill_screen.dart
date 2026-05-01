@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'dart:convert';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../providers/cart_provider.dart';
 import '../providers/theme_provider.dart';
 import '../models/bill_history.dart';
+import '../services/firestore_service.dart';
 
 class BillScreen extends StatelessWidget {
   const BillScreen({super.key});
 
   Future<void> _saveBillToHistory(List items, double total) async {
-    final prefs = await SharedPreferences.getInstance();
     final billNumber =
         '#${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}';
 
@@ -21,9 +19,7 @@ class BillScreen extends StatelessWidget {
       total: total,
     );
 
-    List<String> history = prefs.getStringList('billHistory') ?? [];
-    history.insert(0, jsonEncode(bill.toJson()));
-    await prefs.setStringList('billHistory', history);
+    await FirestoreService().saveBill(bill);
   }
 
   @override

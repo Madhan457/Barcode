@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:convert';
 import '../models/bill_history.dart';
 import '../providers/theme_provider.dart';
+import '../services/firestore_service.dart';
 
 class HistoryScreen extends StatefulWidget {
   const HistoryScreen({super.key});
@@ -13,64 +12,51 @@ class HistoryScreen extends StatefulWidget {
 }
 
 class _HistoryScreenState extends State<HistoryScreen> {
-  List<BillHistory> _history = [];
   String? _expandedBillId;
 
-  @override
-  void initState() {
-    super.initState();
-    _loadHistory();
-  }
-
-  Future<void> _loadHistory() async {
-    final prefs = await SharedPreferences.getInstance();
-    final historyStrings = prefs.getStringList('billHistory') ?? [];
-
-    setState(() {
-      _history = historyStrings
-          .map((str) => BillHistory.fromJson(jsonDecode(str)))
-          .toList();
-    });
-  }
-
   Future<void> _deleteBill(String id) async {
-    final prefs = await SharedPreferences.getInstance();
-    final historyStrings = prefs.getStringList('billHistory') ?? [];
+    try {
+      await FirestoreService().deleteBill(id);
+      
+      setState(() {
+        if (_expandedBillId == id) {
+          _expandedBillId = null;
+        }
+      });
 
-    final updated = historyStrings.where((str) {
-      final bill = BillHistory.fromJson(jsonDecode(str));
-      return bill.id != id;
-    }).toList();
-
-    await prefs.setStringList('billHistory', updated);
-
-    setState(() {
-      _history.removeWhere((bill) => bill.id == id);
-      if (_expandedBillId == id) {
-        _expandedBillId = null;
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Bill deleted')),
+        );
       }
-    });
-
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Bill deleted')),
-      );
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e')),
+        );
+      }
     }
   }
 
   Future<void> _clearAllHistory() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('billHistory');
+    try {
+      await FirestoreService().clearAllBills();
 
-    setState(() {
-      _history.clear();
-      _expandedBillId = null;
-    });
+      setState(() {
+        _expandedBillId = null;
+      });
 
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('History cleared')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('History cleared')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e')),
+        );
+      }
     }
   }
 
@@ -88,7 +74,22 @@ class _HistoryScreenState extends State<HistoryScreen> {
               : [const Color(0xFFf9fafb), const Color(0xFFf3e8ff)],
         ),
       ),
-      child: _history.isEmpty ? _buildEmptyState() : _buildHistoryList(isDark),
+      child: StreamBuilder<List<BillHistory>>(
+        stream: FirestoreService().getBillsStream(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          
+          final history = snapshot.data ?? [];
+          
+          if (history.isEmpty) {
+            return _buildEmptyState();
+          }
+          
+          return _buildHistoryList(isDark, history);
+        },
+      ),
     );
   }
 
@@ -112,7 +113,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
     );
   }
 
-  Widget _buildHistoryList(bool isDark) {
+  Widget _buildHistoryList(bool isDark, List<BillHistory> history) {
     return Column(
       children: [
         Padding(
@@ -138,9 +139,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
         Expanded(
           child: ListView.builder(
             padding: const EdgeInsets.symmetric(horizontal: 16),
-            itemCount: _history.length,
+            itemCount: history.length,
             itemBuilder: (context, index) {
-              final bill = _history[index];
+              final bill = history[index];
               final isExpanded = _expandedBillId == bill.id;
 
               return AnimatedContainer(
