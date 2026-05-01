@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import '../providers/cart_provider.dart';
 import '../providers/theme_provider.dart';
 import '../models/cart_item.dart';
@@ -285,7 +284,7 @@ class _HomeScreenState extends State<HomeScreen>
                   child: ElevatedButton(
                     onPressed: () => cartProvider.clearCart(),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red.withOpacity(0.1),
+                      backgroundColor: Colors.red.withValues(alpha: 0.1),
                       foregroundColor: Colors.red,
                     ),
                     child: const Text('Clear'),
@@ -379,7 +378,7 @@ class _HomeScreenState extends State<HomeScreen>
                     color: Colors.redAccent,
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.redAccent.withOpacity(0.5),
+                        color: Colors.redAccent.withValues(alpha: 0.5),
                         blurRadius: 5,
                       ),
                     ],
@@ -397,7 +396,9 @@ class _HomeScreenState extends State<HomeScreen>
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF374151) : Colors.blue.withOpacity(0.05),
+        color: isDark
+            ? const Color(0xFF374151)
+            : Colors.blue.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Column(
@@ -427,8 +428,9 @@ class _HomeScreenState extends State<HomeScreen>
                 children: [
                   IconButton(
                     onPressed: () => setState(() {
-                      if (_currentProduct!.quantity > 1)
+                      if (_currentProduct!.quantity > 1) {
                         _currentProduct!.quantity--;
+                      }
                     }),
                     icon: const Icon(Icons.remove_circle_outline),
                   ),
