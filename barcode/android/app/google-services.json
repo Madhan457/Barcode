@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "571549908150",
+    "project_id": "barcode-scanner-f32fe",
+    "storage_bucket": "barcode-scanner-f32fe.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:571549908150:android:eb5eee408e3cab19303a17",
+        "android_client_info": {
+          "package_name": "com.example.barcode"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "571549908150-3j18h1fgrt6ce09ea5bpdov2mas6al00.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBYvEj-pd8QIu_gqz5gUW7uypiif0QSC-8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "571549908150-3j18h1fgrt6ce09ea5bpdov2mas6al00.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
