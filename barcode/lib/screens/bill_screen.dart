@@ -1,25 +1,154 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import '../providers/cart_provider.dart';
 import '../providers/theme_provider.dart';
 import '../models/bill_history.dart';
 import '../services/firestore_service.dart';
 
-class BillScreen extends StatelessWidget {
+class BillScreen extends StatefulWidget {
   const BillScreen({super.key});
 
-  Future<void> _saveBillToHistory(List items, double total) async {
-    final billNumber =
-        '#${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}';
+  @override
+  State<BillScreen> createState() => _BillScreenState();
+}
 
-    final bill = BillHistory(
-      id: billNumber,
-      date: DateTime.now(),
-      items: items.cast(),
-      total: total,
+class _BillScreenState extends State<BillScreen> {
+  bool _isPaymentFinished = false;
+  bool _isProcessing = false;
+
+  Future<void> _completeBilling(
+      List<dynamic> items, double total, int totalItems) async {
+    setState(() => _isProcessing = true);
+    try {
+      final billNumber =
+          '#${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}';
+
+      final bill = BillHistory(
+        id: billNumber,
+        date: DateTime.now(),
+        items: items.cast(),
+        total: total,
+      );
+
+      await FirestoreService().saveBillWithStats(bill, totalItems);
+      setState(() {
+        _isPaymentFinished = true;
+        _isProcessing = false;
+      });
+    } catch (e) {
+      setState(() => _isProcessing = false);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error saving bill: $e')),
+        );
+      }
+    }
+  }
+
+  void _showPaymentQR(BuildContext context, double total, List<dynamic> items,
+      int totalItems) async {
+    final userData = await FirestoreService().getUserDataStream().first;
+    final upiId = userData?['upiId'];
+
+    if (upiId == null || upiId == 'Not Set') {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('Please set your UPI ID in Profile first')),
+      );
+      return;
+    }
+
+    final upiUrl =
+        'upi://pay?pa=$upiId&pn=Merchant&am=${total.toStringAsFixed(2)}&cu=INR';
+
+    if (!mounted) return;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: Theme.of(context).scaffoldBackgroundColor,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.grey.withValues(alpha: 0.3),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: 24),
+            const Text(
+              'Scan to Pay',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Amount: ₹${total.toStringAsFixed(2)}',
+              style: const TextStyle(fontSize: 18, color: Colors.grey),
+            ),
+            const SizedBox(height: 24),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(24),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.05),
+                    blurRadius: 20,
+                    offset: const Offset(0, 10),
+                  ),
+                ],
+              ),
+              child: QrImageView(
+                data: upiUrl,
+                version: QrVersions.auto,
+                size: 200.0,
+                backgroundColor: Colors.white,
+              ),
+            ),
+            const SizedBox(height: 24),
+            const Text(
+              'Ask customer to scan this QR code\nusing any UPI App (GPay, PhonePe, etc.)',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.grey),
+            ),
+            const SizedBox(height: 32),
+            SizedBox(
+              width: double.infinity,
+              height: 56,
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  _completeBilling(items, total, totalItems);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF10b981),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                ),
+                child: const Text(
+                  'Payment Completed',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+          ],
+        ),
+      ),
     );
-
-    await FirestoreService().saveBill(bill);
   }
 
   @override
@@ -28,7 +157,7 @@ class BillScreen extends StatelessWidget {
     final isDark = Provider.of<ThemeProvider>(context).isDarkMode;
     final items = cartProvider.getCartSnapshot();
 
-    if (items.isEmpty) {
+    if (items.isEmpty && !_isPaymentFinished) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         Navigator.pushReplacementNamed(context, '/main');
       });
@@ -94,26 +223,38 @@ class BillScreen extends StatelessWidget {
                           // Header
                           Container(
                             padding: const EdgeInsets.all(24),
-                            decoration: const BoxDecoration(
+                            decoration: BoxDecoration(
                               gradient: LinearGradient(
-                                colors: [Color(0xFF10b981), Color(0xFF2563eb)],
+                                colors: _isPaymentFinished
+                                    ? [
+                                        const Color(0xFF10b981),
+                                        const Color(0xFF2563eb)
+                                      ]
+                                    : [
+                                        const Color(0xFF3b82f6),
+                                        const Color(0xFF9333ea)
+                                      ],
                               ),
-                              borderRadius: BorderRadius.only(
+                              borderRadius: const BorderRadius.only(
                                 topLeft: Radius.circular(24),
                                 topRight: Radius.circular(24),
                               ),
                             ),
                             child: Column(
                               children: [
-                                const Icon(
-                                  Icons.check_circle,
+                                Icon(
+                                  _isPaymentFinished
+                                      ? Icons.check_circle
+                                      : Icons.receipt_long,
                                   size: 64,
                                   color: Colors.white,
                                 ),
                                 const SizedBox(height: 12),
-                                const Text(
-                                  'Payment Success!',
-                                  style: TextStyle(
+                                Text(
+                                  _isPaymentFinished
+                                      ? 'Billing Finished!'
+                                      : 'Bill Summary',
+                                  style: const TextStyle(
                                     color: Colors.white,
                                     fontSize: 28,
                                     fontWeight: FontWeight.bold,
@@ -281,80 +422,121 @@ class BillScreen extends StatelessWidget {
 
                                 const SizedBox(height: 24),
 
-                                // Action Buttons
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: _buildActionButton(
-                                        Icons.print,
-                                        'Print',
-                                        const Color(0xFF3b82f6),
-                                        () => ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          const SnackBar(
-                                              content:
-                                                  Text('Print dialog opened')),
+                                if (!_isPaymentFinished) ...[
+                                  // Payment Buttons
+                                  SizedBox(
+                                    width: double.infinity,
+                                    height: 56,
+                                    child: ElevatedButton.icon(
+                                      onPressed: _isProcessing
+                                          ? null
+                                          : () => _showPaymentQR(
+                                              context, total, items, totalItems),
+                                      icon: const Icon(Icons.qr_code),
+                                      label: Text(
+                                        _isProcessing
+                                            ? 'Processing...'
+                                            : 'Pay via UPI QR',
+                                        style: const TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor:
+                                            const Color(0xFF3b82f6),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(16),
                                         ),
                                       ),
-                                    ),
-                                    const SizedBox(width: 12),
-                                    Expanded(
-                                      child: _buildActionButton(
-                                        Icons.download,
-                                        'Save PDF',
-                                        const Color(0xFF9333ea),
-                                        () => ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          const SnackBar(
-                                              content:
-                                                  Text('Receipt saved as PDF')),
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 12),
-                                    Expanded(
-                                      child: _buildActionButton(
-                                        Icons.share,
-                                        'Share',
-                                        const Color(0xFF10b981),
-                                        () => ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          const SnackBar(
-                                              content: Text('Sharing receipt')),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-
-                                const SizedBox(height: 16),
-
-                                // New Bill Button
-                                SizedBox(
-                                  width: double.infinity,
-                                  height: 56,
-                                  child: ElevatedButton(
-                                    onPressed: () async {
-                                      await _saveBillToHistory(items, total);
-                                      if (!context.mounted) return;
-                                      cartProvider.clearCart();
-                                      Navigator.pushReplacementNamed(
-                                          context, '/main');
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: const Color(0xFF3b82f6),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(16),
-                                      ),
-                                    ),
-                                    child: const Text(
-                                      'New Bill',
-                                      style: TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold),
                                     ),
                                   ),
-                                ),
+                                  const SizedBox(height: 12),
+                                  SizedBox(
+                                    width: double.infinity,
+                                    height: 56,
+                                    child: OutlinedButton.icon(
+                                      onPressed: _isProcessing
+                                          ? null
+                                          : () => _completeBilling(
+                                              items, total, totalItems),
+                                      icon: const Icon(Icons.money),
+                                      label: const Text(
+                                        'Pay via Cash',
+                                        style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                      style: OutlinedButton.styleFrom(
+                                        side: const BorderSide(
+                                            color: Color(0xFF10b981), width: 2),
+                                        foregroundColor:
+                                            const Color(0xFF10b981),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(16),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ] else ...[
+                                  // Payment Complete View
+                                  const Text(
+                                    'Payment Complete!',
+                                    style: TextStyle(
+                                        color: Color(0xFF10b981),
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  const SizedBox(height: 24),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: _buildActionButton(
+                                          Icons.print,
+                                          'Print',
+                                          const Color(0xFF3b82f6),
+                                          () {},
+                                        ),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      Expanded(
+                                        child: _buildActionButton(
+                                          Icons.share,
+                                          'Share',
+                                          const Color(0xFF10b981),
+                                          () {},
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 24),
+                                  SizedBox(
+                                    width: double.infinity,
+                                    height: 56,
+                                    child: ElevatedButton(
+                                      onPressed: () {
+                                        cartProvider.clearCart();
+                                        Navigator.pushReplacementNamed(
+                                            context, '/main');
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor:
+                                            const Color(0xFF10b981),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(16),
+                                        ),
+                                      ),
+                                      child: const Text(
+                                        'New Bill',
+                                        style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ],
                             ),
                           ),

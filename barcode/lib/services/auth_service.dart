@@ -50,11 +50,24 @@ class AuthService {
       return _firebaseAuth.signInWithPopup(provider);
     }
 
-    await _initializeGoogleSignIn();
-    final account = await GoogleSignIn.instance.authenticate();
-    final authentication = account.authentication;
-    final credential = GoogleAuthProvider.credential(
-      idToken: authentication.idToken,
+    final GoogleSignIn googleSignIn = GoogleSignIn(
+      serverClientId:
+          '571549908150-3j18h1fgrt6ce09ea5bpdov2mas6al00.apps.googleusercontent.com',
+    );
+    final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+
+    if (googleUser == null) {
+      throw FirebaseAuthException(
+        code: 'canceled-popup-request',
+        message: 'Sign-in was cancelled by the user.',
+      );
+    }
+
+    final GoogleSignInAuthentication googleAuth =
+        await googleUser.authentication;
+    final AuthCredential credential = GoogleAuthProvider.credential(
+      accessToken: googleAuth.accessToken,
+      idToken: googleAuth.idToken,
     );
 
     return _firebaseAuth.signInWithCredential(credential);
@@ -63,25 +76,7 @@ class AuthService {
   Future<void> signOut() async {
     await Future.wait([
       _firebaseAuth.signOut(),
-      GoogleSignIn.instance.signOut().catchError((_) {}),
+      GoogleSignIn().signOut().catchError((_) {}),
     ]);
-  }
-
-  Future<void> _initializeGoogleSignIn() async {
-    if (_googleInitialized) {
-      return;
-    }
-
-    const clientId = String.fromEnvironment('GOOGLE_CLIENT_ID');
-    const serverClientId = String.fromEnvironment(
-      'GOOGLE_SERVER_CLIENT_ID',
-      defaultValue:
-          '571549908150-3j18h1fgrt6ce09ea5bpdov2mas6al00.apps.googleusercontent.com',
-    );
-    await GoogleSignIn.instance.initialize(
-      clientId: clientId.isEmpty ? null : clientId,
-      serverClientId: serverClientId.isEmpty ? null : serverClientId,
-    );
-    _googleInitialized = true;
   }
 }
