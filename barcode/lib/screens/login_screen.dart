@@ -23,9 +23,9 @@ class _LoginScreenState extends State<LoginScreen> {
     }
 
     await context.read<AppAuthProvider>().signInWithEmail(
-          email: _emailController.text,
-          password: _passwordController.text,
-        );
+      email: _emailController.text,
+      password: _passwordController.text,
+    );
   }
 
   Future<void> _signInWithGoogle() async {
@@ -44,11 +44,7 @@ class _LoginScreenState extends State<LoginScreen> {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              Color(0xFF2563eb),
-              Color(0xFF9333ea),
-              Color(0xFF2563eb),
-            ],
+            colors: [Color(0xFF000B1A), Color(0xFF06B6D4)],
           ),
         ),
         child: SafeArea(
@@ -61,24 +57,15 @@ class _LoginScreenState extends State<LoginScreen> {
                   Container(
                     width: 80,
                     height: 80,
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFF60a5fa), Color(0xFFa855f7)],
-                      ),
-                      borderRadius: BorderRadius.circular(40),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.3),
-                          blurRadius: 20,
-                          offset: const Offset(0, 10),
+                    child: Center(
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(20),
+                        child: Image.asset(
+                          'assets/images/app_logo.jpg',
+                          width: 60,
+                          height: 60,
+                          fit: BoxFit.cover,
                         ),
-                      ],
-                    ),
-                    child: const Center(
-                      child: Icon(
-                        Icons.shopping_cart_checkout,
-                        color: Colors.white,
-                        size: 42,
                       ),
                     ),
                   ),
@@ -110,7 +97,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       key: _formKey,
                       child: Column(
                         children: [
-
                           if (authProvider.errorMessage != null) ...[
                             _buildMessage(
                               authProvider.errorMessage!,
@@ -170,9 +156,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                   onPressed: isBusy
                                       ? null
                                       : () => setState(
-                                            () => _obscurePassword =
-                                                !_obscurePassword,
-                                          ),
+                                          () => _obscurePassword =
+                                              !_obscurePassword,
+                                        ),
                                 ),
                               ),
                             ),
@@ -184,7 +170,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             child: ElevatedButton(
                               onPressed: isBusy ? null : _signInWithEmail,
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFF3b82f6),
+                                backgroundColor: const Color(0xFF06B6D4),
                                 foregroundColor: Colors.white,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(16),
@@ -236,12 +222,29 @@ class _LoginScreenState extends State<LoginScreen> {
                             height: 56,
                             child: OutlinedButton.icon(
                               onPressed: isBusy ? null : _signInWithGoogle,
-                              icon: const Icon(Icons.g_mobiledata, size: 28),
+                              icon: Container(
+                                width: 24,
+                                height: 24,
+                                decoration: const BoxDecoration(
+                                  color: Colors.white,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Center(
+                                  child: Text(
+                                    'G',
+                                    style: TextStyle(
+                                      color: Color(0xFF4285F4),
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ),
+                              ),
                               label: const Text('Continue with Google'),
                               style: OutlinedButton.styleFrom(
                                 foregroundColor: Colors.white,
                                 side: BorderSide(
-                                  color: Colors.white.withValues(alpha: 0.2),
+                                  color: Colors.white.withValues(alpha: 0.3),
                                 ),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(16),
@@ -310,7 +313,7 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
-        borderSide: const BorderSide(color: Color(0xFF60a5fa), width: 2),
+        borderSide: const BorderSide(color: Color(0xFF06B6D4), width: 2),
       ),
       errorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),

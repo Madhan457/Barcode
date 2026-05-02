@@ -53,9 +53,8 @@ class _SignupScreenState extends State<SignupScreen> {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              Color(0xFF9333ea),
-              Color(0xFF2563eb),
-              Color(0xFF9333ea),
+              Color(0xFF000B1A),
+              Color(0xFF06B6D4),
             ],
           ),
         ),
@@ -70,23 +69,18 @@ class _SignupScreenState extends State<SignupScreen> {
                     width: 80,
                     height: 80,
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFFa855f7), Color(0xFF60a5fa)],
-                      ),
-                      borderRadius: BorderRadius.circular(40),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.3),
-                          blurRadius: 20,
-                          offset: const Offset(0, 10),
-                        ),
-                      ],
+                      color: Colors.white.withValues(alpha: 0.1),
+                      shape: BoxShape.circle,
                     ),
-                    child: const Center(
-                      child: Icon(
-                        Icons.shopping_cart_checkout,
-                        color: Colors.white,
-                        size: 42,
+                    child: Center(
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(20),
+                        child: Image.asset(
+                          'assets/images/app_logo.jpg',
+                          width: 60,
+                          height: 60,
+                          fit: BoxFit.cover,
+                        ),
                       ),
                     ),
                   ),
@@ -213,7 +207,7 @@ class _SignupScreenState extends State<SignupScreen> {
                             child: ElevatedButton(
                               onPressed: isBusy ? null : _createAccount,
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFF9333ea),
+                                backgroundColor: const Color(0xFF06B6D4),
                                 foregroundColor: Colors.white,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(16),
@@ -265,12 +259,29 @@ class _SignupScreenState extends State<SignupScreen> {
                             height: 56,
                             child: OutlinedButton.icon(
                               onPressed: isBusy ? null : _signInWithGoogle,
-                              icon: const Icon(Icons.g_mobiledata, size: 28),
+                              icon: Container(
+                                width: 24,
+                                height: 24,
+                                decoration: const BoxDecoration(
+                                  color: Colors.white,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Center(
+                                  child: Text(
+                                    'G',
+                                    style: TextStyle(
+                                      color: Color(0xFF4285F4),
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ),
+                              ),
                               label: const Text('Continue with Google'),
                               style: OutlinedButton.styleFrom(
                                 foregroundColor: Colors.white,
                                 side: BorderSide(
-                                  color: Colors.white.withValues(alpha: 0.2),
+                                  color: Colors.white.withValues(alpha: 0.3),
                                 ),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(16),
@@ -339,7 +350,7 @@ class _SignupScreenState extends State<SignupScreen> {
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
-        borderSide: const BorderSide(color: Color(0xFFa855f7), width: 2),
+        borderSide: const BorderSide(color: Color(0xFF06B6D4), width: 2),
       ),
       errorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
