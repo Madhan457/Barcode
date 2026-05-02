@@ -57,7 +57,10 @@ class _HomeScreenState extends State<HomeScreen>
 
     try {
       final productData = await FirestoreService().getProductByBarcode(code);
-
+      final mrpValue = productData != null 
+          ? (productData['mrp'] ?? productData['price'] ?? 0)
+          : 0;
+      
       if (!mounted) return;
 
       if (productData != null) {
@@ -65,7 +68,9 @@ class _HomeScreenState extends State<HomeScreen>
           _currentProduct = CartItem(
             id: code,
             name: productData['name'] ?? 'Unknown',
-            price: (productData['mrp'] ?? 0).toDouble(),
+            price: mrpValue is num
+                ? mrpValue.toDouble()
+                : double.tryParse(mrpValue.toString()) ?? 0.0,
             quantity: 1,
           );
         });
@@ -152,6 +157,21 @@ class _HomeScreenState extends State<HomeScreen>
                     MobileScanner(
                       controller: _scannerController,
                       onDetect: _handleBarcode,
+                      errorBuilder: (context, error) {
+                        return Center(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(Icons.error_outline, color: Colors.white, size: 48),
+                              const SizedBox(height: 16),
+                              Text(
+                                'Scanner Error: ${error.errorCode}',
+                                style: const TextStyle(color: Colors.white),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
                     ),
                     // Overlay Box
                     _buildScannerOverlay(isDark),
@@ -189,25 +209,29 @@ class _HomeScreenState extends State<HomeScreen>
                         : const Color(0xFFe5e7eb),
                   ),
                 ),
-                child: TextField(
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: isDark ? Colors.white : Colors.black,
-                    fontWeight: FontWeight.bold,
+                child: Semantics(
+                  label: 'Manual Barcode Input',
+                  child: TextField(
+                    restorationId: 'manual_barcode_input',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: isDark ? Colors.white : Colors.black,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    decoration: const InputDecoration(
+                      hintText: 'Or Enter Barcode Manually',
+                      prefixIcon: Icon(Icons.edit, color: Color(0xFF3b82f6)),
+                      border: InputBorder.none,
+                      contentPadding: EdgeInsets.symmetric(vertical: 16),
+                    ),
+                    onSubmitted: (value) {
+                      if (value.isNotEmpty) {
+                        _handleBarcode(
+                          BarcodeCapture(barcodes: [Barcode(rawValue: value)]),
+                        );
+                      }
+                    },
                   ),
-                  decoration: const InputDecoration(
-                    hintText: 'Or Enter Barcode Manually',
-                    prefixIcon: Icon(Icons.edit, color: Color(0xFF3b82f6)),
-                    border: InputBorder.none,
-                    contentPadding: EdgeInsets.symmetric(vertical: 16),
-                  ),
-                  onSubmitted: (value) {
-                    if (value.isNotEmpty) {
-                      _handleBarcode(
-                        BarcodeCapture(barcodes: [Barcode(rawValue: value)]),
-                      );
-                    }
-                  },
                 ),
               ),
               const SizedBox(height: 24),

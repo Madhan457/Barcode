@@ -126,71 +126,83 @@ class _SignupScreenState extends State<SignupScreen> {
                             ),
                             const SizedBox(height: 16),
                           ],
-                          TextFormField(
-                            controller: _nameController,
-                            enabled: !isBusy,
-                            textInputAction: TextInputAction.next,
-                            style: const TextStyle(color: Colors.white),
-                            validator: (value) {
-                              if ((value ?? '').trim().length < 2) {
-                                return 'Enter your name.';
-                              }
-                              return null;
-                            },
-                            decoration: _inputDecoration(
-                              hintText: 'Full Name',
-                              icon: Icons.person_outline,
+                          Semantics(
+                            label: 'Full Name Input',
+                            child: TextFormField(
+                              restorationId: 'signup_name_field',
+                              controller: _nameController,
+                              enabled: !isBusy,
+                              textInputAction: TextInputAction.next,
+                              style: const TextStyle(color: Colors.white),
+                              validator: (value) {
+                                if ((value ?? '').trim().length < 2) {
+                                  return 'Enter your name.';
+                                }
+                                return null;
+                              },
+                              decoration: _inputDecoration(
+                                hintText: 'Full Name',
+                                icon: Icons.person_outline,
+                              ),
                             ),
                           ),
                           const SizedBox(height: 16),
-                          TextFormField(
-                            controller: _emailController,
-                            enabled: !isBusy,
-                            keyboardType: TextInputType.emailAddress,
-                            textInputAction: TextInputAction.next,
-                            style: const TextStyle(color: Colors.white),
-                            validator: (value) {
-                              final email = value?.trim() ?? '';
-                              if (email.isEmpty || !email.contains('@')) {
-                                return 'Enter a valid email.';
-                              }
-                              return null;
-                            },
-                            decoration: _inputDecoration(
-                              hintText: 'Email',
-                              icon: Icons.mail_outline,
+                          Semantics(
+                            label: 'Email Input',
+                            child: TextFormField(
+                              restorationId: 'signup_email_field',
+                              controller: _emailController,
+                              enabled: !isBusy,
+                              keyboardType: TextInputType.emailAddress,
+                              textInputAction: TextInputAction.next,
+                              style: const TextStyle(color: Colors.white),
+                              validator: (value) {
+                                final email = value?.trim() ?? '';
+                                if (email.isEmpty || !email.contains('@')) {
+                                  return 'Enter a valid email.';
+                                }
+                                return null;
+                              },
+                              decoration: _inputDecoration(
+                                hintText: 'Email',
+                                icon: Icons.mail_outline,
+                              ),
                             ),
                           ),
                           const SizedBox(height: 16),
-                          TextFormField(
-                            controller: _passwordController,
-                            enabled: !isBusy,
-                            obscureText: _obscurePassword,
-                            textInputAction: TextInputAction.done,
-                            onFieldSubmitted: (_) => _createAccount(),
-                            style: const TextStyle(color: Colors.white),
-                            validator: (value) {
-                              if ((value ?? '').length < 6) {
-                                return 'Password must be at least 6 characters.';
-                              }
-                              return null;
-                            },
-                            decoration: _inputDecoration(
-                              hintText: 'Password',
-                              icon: Icons.lock_outline,
-                              suffixIcon: IconButton(
-                                icon: Icon(
-                                  _obscurePassword
-                                      ? Icons.visibility_off
-                                      : Icons.visibility,
-                                  color: const Color(0xFFe9d5ff),
+                          Semantics(
+                            label: 'Password Input',
+                            child: TextFormField(
+                              restorationId: 'signup_password_field',
+                              controller: _passwordController,
+                              enabled: !isBusy,
+                              obscureText: _obscurePassword,
+                              textInputAction: TextInputAction.done,
+                              onFieldSubmitted: (_) => _createAccount(),
+                              style: const TextStyle(color: Colors.white),
+                              validator: (value) {
+                                if ((value ?? '').length < 6) {
+                                  return 'Password must be at least 6 characters.';
+                                }
+                                return null;
+                              },
+                              decoration: _inputDecoration(
+                                hintText: 'Password',
+                                icon: Icons.lock_outline,
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                    _obscurePassword
+                                        ? Icons.visibility_off
+                                        : Icons.visibility,
+                                    color: const Color(0xFFe9d5ff),
+                                  ),
+                                  onPressed: isBusy
+                                      ? null
+                                      : () => setState(
+                                            () => _obscurePassword =
+                                                !_obscurePassword,
+                                          ),
                                 ),
-                                onPressed: isBusy
-                                    ? null
-                                    : () => setState(
-                                          () => _obscurePassword =
-                                              !_obscurePassword,
-                                        ),
                               ),
                             ),
                           ),

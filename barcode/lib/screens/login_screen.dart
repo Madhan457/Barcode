@@ -118,54 +118,62 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                             const SizedBox(height: 16),
                           ],
-                          TextFormField(
-                            controller: _emailController,
-                            enabled: !isBusy,
-                            keyboardType: TextInputType.emailAddress,
-                            textInputAction: TextInputAction.next,
-                            style: const TextStyle(color: Colors.white),
-                            validator: (value) {
-                              final email = value?.trim() ?? '';
-                              if (email.isEmpty || !email.contains('@')) {
-                                return 'Enter a valid email.';
-                              }
-                              return null;
-                            },
-                            decoration: _inputDecoration(
-                              hintText: 'Email',
-                              icon: Icons.mail_outline,
+                          Semantics(
+                            label: 'Email Input',
+                            child: TextFormField(
+                              restorationId: 'login_email_field',
+                              controller: _emailController,
+                              enabled: !isBusy,
+                              keyboardType: TextInputType.emailAddress,
+                              textInputAction: TextInputAction.next,
+                              style: const TextStyle(color: Colors.white),
+                              validator: (value) {
+                                final email = value?.trim() ?? '';
+                                if (email.isEmpty || !email.contains('@')) {
+                                  return 'Enter a valid email.';
+                                }
+                                return null;
+                              },
+                              decoration: _inputDecoration(
+                                hintText: 'Email',
+                                icon: Icons.mail_outline,
+                              ),
                             ),
                           ),
                           const SizedBox(height: 16),
-                          TextFormField(
-                            controller: _passwordController,
-                            enabled: !isBusy,
-                            obscureText: _obscurePassword,
-                            textInputAction: TextInputAction.done,
-                            onFieldSubmitted: (_) => _signInWithEmail(),
-                            style: const TextStyle(color: Colors.white),
-                            validator: (value) {
-                              if ((value ?? '').length < 6) {
-                                return 'Password must be at least 6 characters.';
-                              }
-                              return null;
-                            },
-                            decoration: _inputDecoration(
-                              hintText: 'Password',
-                              icon: Icons.lock_outline,
-                              suffixIcon: IconButton(
-                                icon: Icon(
-                                  _obscurePassword
-                                      ? Icons.visibility_off
-                                      : Icons.visibility,
-                                  color: const Color(0xFFbfdbfe),
+                          Semantics(
+                            label: 'Password Input',
+                            child: TextFormField(
+                              restorationId: 'login_password_field',
+                              controller: _passwordController,
+                              enabled: !isBusy,
+                              obscureText: _obscurePassword,
+                              textInputAction: TextInputAction.done,
+                              onFieldSubmitted: (_) => _signInWithEmail(),
+                              style: const TextStyle(color: Colors.white),
+                              validator: (value) {
+                                if ((value ?? '').length < 6) {
+                                  return 'Password must be at least 6 characters.';
+                                }
+                                return null;
+                              },
+                              decoration: _inputDecoration(
+                                hintText: 'Password',
+                                icon: Icons.lock_outline,
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                    _obscurePassword
+                                        ? Icons.visibility_off
+                                        : Icons.visibility,
+                                    color: const Color(0xFFbfdbfe),
+                                  ),
+                                  onPressed: isBusy
+                                      ? null
+                                      : () => setState(
+                                            () => _obscurePassword =
+                                                !_obscurePassword,
+                                          ),
                                 ),
-                                onPressed: isBusy
-                                    ? null
-                                    : () => setState(
-                                          () => _obscurePassword =
-                                              !_obscurePassword,
-                                        ),
                               ),
                             ),
                           ),

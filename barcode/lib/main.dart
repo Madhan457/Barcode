@@ -15,9 +15,7 @@ import 'services/auth_service.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   runApp(const MyApp());
 }
@@ -31,11 +29,7 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => CartProvider()),
-        ChangeNotifierProvider(
-          create: (_) => AppAuthProvider(
-            AuthService(),
-          ),
-        ),
+        ChangeNotifierProvider(create: (_) => AppAuthProvider(AuthService())),
       ],
       child: Consumer<ThemeProvider>(
         builder: (context, themeProvider, child) {
@@ -43,14 +37,19 @@ class MyApp extends StatelessWidget {
             title: 'Billing System',
             debugShowCheckedModeBanner: false,
             theme: ThemeData(
-              brightness: Brightness.light,
-              primarySwatch: Colors.blue,
-              scaffoldBackgroundColor: Colors.white,
+              useMaterial3: true,
+              colorScheme: ColorScheme.fromSeed(
+                seedColor: Colors.blue,
+                brightness: Brightness.light,
+              ),
             ),
             darkTheme: ThemeData(
-              brightness: Brightness.dark,
-              primarySwatch: Colors.blue,
-              scaffoldBackgroundColor: const Color(0xFF1a1a2e),
+              useMaterial3: true,
+              colorScheme: ColorScheme.fromSeed(
+                seedColor: Colors.blue,
+                brightness: Brightness.dark,
+                surface: const Color(0xFF1a1a2e),
+              ),
             ),
             themeMode: themeProvider.themeMode,
             home: const AuthGate(),
