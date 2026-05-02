@@ -225,15 +225,10 @@ class _BillScreenState extends State<BillScreen> {
                             padding: const EdgeInsets.all(24),
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
-                                colors: _isPaymentFinished
-                                    ? [
-                                        const Color(0xFF10b981),
-                                        const Color(0xFF2563eb)
-                                      ]
-                                    : [
-                                        const Color(0xFF3b82f6),
-                                        const Color(0xFF9333ea)
-                                      ],
+                                colors: [
+                                  const Color(0xFF84CC16),
+                                  const Color(0xFF06B6D4)
+                                ],
                               ),
                               borderRadius: const BorderRadius.only(
                                 topLeft: Radius.circular(24),
@@ -386,7 +381,7 @@ class _BillScreenState extends State<BillScreen> {
                                       style: const TextStyle(
                                         fontSize: 20,
                                         fontWeight: FontWeight.bold,
-                                        color: Color(0xFF2563eb),
+                                        color: Color(0xFF06B6D4),
                                       ),
                                     ),
                                   ],
@@ -443,7 +438,7 @@ class _BillScreenState extends State<BillScreen> {
                                       ),
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor:
-                                            const Color(0xFF3b82f6),
+                                            const Color(0xFF06B6D4),
                                         shape: RoundedRectangleBorder(
                                           borderRadius:
                                               BorderRadius.circular(16),
@@ -469,9 +464,9 @@ class _BillScreenState extends State<BillScreen> {
                                       ),
                                       style: OutlinedButton.styleFrom(
                                         side: const BorderSide(
-                                            color: Color(0xFF10b981), width: 2),
+                                            color: Color(0xFF84CC16), width: 2),
                                         foregroundColor:
-                                            const Color(0xFF10b981),
+                                            const Color(0xFF84CC16),
                                         shape: RoundedRectangleBorder(
                                           borderRadius:
                                               BorderRadius.circular(16),

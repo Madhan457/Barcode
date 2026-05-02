@@ -139,12 +139,12 @@ class _HomeScreenState extends State<HomeScreen>
                 height: 300,
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
-                    colors: [Color(0xFF3b82f6), Color(0xFF9333ea)],
+                    colors: [Color(0xFF84CC16), Color(0xFF06B6D4)],
                   ),
                   borderRadius: BorderRadius.circular(24),
                   boxShadow: [
                     BoxShadow(
-                      color: const Color(0xFF3b82f6).withValues(alpha: 0.3),
+                      color: const Color(0xFF06B6D4).withValues(alpha: 0.3),
                       blurRadius: 20,
                       offset: const Offset(0, 10),
                     ),
@@ -296,7 +296,7 @@ class _HomeScreenState extends State<HomeScreen>
                   style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: Colors.blue,
+                    color: Color(0xFF06B6D4),
                   ),
                 ),
               ],
@@ -320,7 +320,7 @@ class _HomeScreenState extends State<HomeScreen>
                   child: ElevatedButton(
                     onPressed: () => Navigator.pushNamed(context, '/bill'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF10b981),
+                      backgroundColor: const Color(0xFF06B6D4),
                     ),
                     child: const Text('Finish Billing'),
                   ),

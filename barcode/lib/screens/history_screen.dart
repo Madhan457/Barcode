@@ -175,8 +175,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
                               decoration: BoxDecoration(
                                 gradient: const LinearGradient(
                                   colors: [
-                                    Color(0xFF3b82f6),
-                                    Color(0xFF9333ea)
+                                    Color(0xFF84CC16),
+                                    Color(0xFF06B6D4)
                                   ],
                                 ),
                                 borderRadius: BorderRadius.circular(12),
@@ -220,7 +220,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                   style: const TextStyle(
                                     fontSize: 20,
                                     fontWeight: FontWeight.bold,
-                                    color: Color(0xFF2563eb),
+                                    color: Color(0xFF06B6D4),
                                   ),
                                 ),
                                 Text(

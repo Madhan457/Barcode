@@ -15,7 +15,7 @@ class ProfileScreen extends StatelessWidget {
     final isDark = themeProvider.isDarkMode;
     final displayName = user?.displayName?.trim().isNotEmpty == true
         ? user!.displayName!
-        : 'Billing User';
+        : 'Quick Bill User';
     final email = user?.email ?? 'No email available';
 
     return StreamBuilder<Map<String, dynamic>?>(
@@ -45,12 +45,12 @@ class ProfileScreen extends StatelessWidget {
                 padding: const EdgeInsets.all(32),
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
-                    colors: [Color(0xFF3b82f6), Color(0xFF9333ea)],
+                    colors: [Color(0xFF84CC16), Color(0xFF06B6D4)],
                   ),
                   borderRadius: BorderRadius.circular(24),
                   boxShadow: [
                     BoxShadow(
-                      color: const Color(0xFF3b82f6).withValues(alpha: 0.3),
+                      color: const Color(0xFF06B6D4).withValues(alpha: 0.3),
                       blurRadius: 20,
                       offset: const Offset(0, 10),
                     ),
@@ -65,10 +65,15 @@ class ProfileScreen extends StatelessWidget {
                         color: Colors.white.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(48),
                         border: Border.all(
-                            color: Colors.white.withValues(alpha: 0.3), width: 4),
+                          color: Colors.white.withValues(alpha: 0.3),
+                          width: 4,
+                        ),
                       ),
-                      child:
-                          const Icon(Icons.person, size: 48, color: Colors.white),
+                      child: const Icon(
+                        Icons.person,
+                        size: 48,
+                        color: Colors.white,
+                      ),
                     ),
                     const SizedBox(height: 16),
                     Text(
@@ -82,14 +87,18 @@ class ProfileScreen extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       email,
-                      style:
-                          const TextStyle(color: Color(0xFFbfdbfe), fontSize: 14),
+                      style: const TextStyle(
+                        color: Color(0xFFbfdbfe),
+                        fontSize: 14,
+                      ),
                     ),
                     const SizedBox(height: 16),
                     ElevatedButton(
                       onPressed: () {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Edit profile coming soon')),
+                          const SnackBar(
+                            content: Text('Edit profile coming soon'),
+                          ),
                         );
                       },
                       style: ElevatedButton.styleFrom(
@@ -97,11 +106,14 @@ class ProfileScreen extends StatelessWidget {
                         foregroundColor: Colors.white,
                         elevation: 0,
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 24, vertical: 12),
+                          horizontal: 24,
+                          vertical: 12,
+                        ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20),
                           side: BorderSide(
-                              color: Colors.white.withValues(alpha: 0.3)),
+                            color: Colors.white.withValues(alpha: 0.3),
+                          ),
                         ),
                       ),
                       child: const Text('Edit Profile'),
@@ -118,8 +130,9 @@ class ProfileScreen extends StatelessWidget {
                   color: isDark ? const Color(0xFF1f2937) : Colors.white,
                   borderRadius: BorderRadius.circular(24),
                   border: Border.all(
-                    color:
-                        isDark ? const Color(0xFF374151) : const Color(0xFFe5e7eb),
+                    color: isDark
+                        ? const Color(0xFF374151)
+                        : const Color(0xFFe5e7eb),
                   ),
                 ),
                 child: Column(
@@ -127,14 +140,20 @@ class ProfileScreen extends StatelessWidget {
                   children: [
                     const Text(
                       'Statistics',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     const SizedBox(height: 16),
                     Row(
                       children: [
                         Expanded(
                           child: _buildStatItem(
-                              '$totalBills', 'Total Bills', const Color(0xFF2563eb)),
+                            '$totalBills',
+                            'Total Bills',
+                            const Color(0xFF2563eb),
+                          ),
                         ),
                         Container(
                           width: 1,
@@ -145,9 +164,10 @@ class ProfileScreen extends StatelessWidget {
                         ),
                         Expanded(
                           child: _buildStatItem(
-                              '₹${totalRevenue > 1000 ? (totalRevenue / 1000).toStringAsFixed(1) + 'K' : totalRevenue.toStringAsFixed(0)}',
-                              'Revenue',
-                              const Color(0xFF9333ea)),
+                            '₹${totalRevenue > 1000 ? (totalRevenue / 1000).toStringAsFixed(1) + 'K' : totalRevenue.toStringAsFixed(0)}',
+                            'Revenue',
+                            const Color(0xFF9333ea),
+                          ),
                         ),
                         Container(
                           width: 1,
@@ -158,7 +178,10 @@ class ProfileScreen extends StatelessWidget {
                         ),
                         Expanded(
                           child: _buildStatItem(
-                              '$totalItemsSold', 'Items Sold', const Color(0xFF10b981)),
+                            '$totalItemsSold',
+                            'Items Sold',
+                            const Color(0xFF10b981),
+                          ),
                         ),
                       ],
                     ),
@@ -173,8 +196,9 @@ class ProfileScreen extends StatelessWidget {
                   color: isDark ? const Color(0xFF1f2937) : Colors.white,
                   borderRadius: BorderRadius.circular(24),
                   border: Border.all(
-                    color:
-                        isDark ? const Color(0xFF374151) : const Color(0xFFe5e7eb),
+                    color: isDark
+                        ? const Color(0xFF374151)
+                        : const Color(0xFFe5e7eb),
                   ),
                 ),
                 child: Column(
@@ -184,7 +208,10 @@ class ProfileScreen extends StatelessWidget {
                       padding: EdgeInsets.all(20),
                       child: Text(
                         'Settings',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                     _buildSettingItem(
@@ -208,7 +235,9 @@ class ProfileScreen extends StatelessWidget {
                       color: const Color(0xFF9333ea),
                       onTap: () {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Notifications settings')),
+                          const SnackBar(
+                            content: Text('Notifications settings'),
+                          ),
                         );
                       },
                     ),
@@ -218,7 +247,9 @@ class ProfileScreen extends StatelessWidget {
                       color: const Color(0xFF10b981),
                       onTap: () {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Help center coming soon')),
+                          const SnackBar(
+                            content: Text('Help center coming soon'),
+                          ),
                         );
                       },
                     ),
@@ -236,65 +267,70 @@ class ProfileScreen extends StatelessWidget {
                   ],
                 ),
               ),
-          const SizedBox(height: 24),
+              const SizedBox(height: 24),
 
-          // Logout Button
-          SizedBox(
-            width: double.infinity,
-            height: 56,
-            child: ElevatedButton.icon(
-              onPressed: authProvider.isLoading
-                  ? null
-                  : () async {
-                      await authProvider.signOut();
-                      if (!context.mounted) return;
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                            content: Text('Logged out successfully')),
-                      );
-                    },
-              icon: const Icon(Icons.logout),
-              label: Text(
-                authProvider.isLoading ? 'Logging out...' : 'Logout',
-                style:
-                    const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red.shade500,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
+              // Logout Button
+              SizedBox(
+                width: double.infinity,
+                height: 56,
+                child: ElevatedButton.icon(
+                  onPressed: authProvider.isLoading
+                      ? null
+                      : () async {
+                          await authProvider.signOut();
+                          if (!context.mounted) return;
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Logged out successfully'),
+                            ),
+                          );
+                        },
+                  icon: const Icon(Icons.logout),
+                  label: Text(
+                    authProvider.isLoading ? 'Logging out...' : 'Logout',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red.shade500,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                  ),
                 ),
               ),
-            ),
-          ),
-          const SizedBox(height: 24),
+              const SizedBox(height: 24),
 
-          // App Info
-          const Center(
-            child: Column(
-              children: [
-                Text(
-                  'Version 1.0.0',
-                  style: TextStyle(color: Colors.grey, fontSize: 12),
+              // App Info
+              const Center(
+                child: Column(
+                  children: [
+                    Text(
+                      'Version 1.0.0',
+                      style: TextStyle(color: Colors.grey, fontSize: 12),
+                    ),
+                    SizedBox(height: 4),
+                    Text(
+                      '© 2026 Quick Bill',
+                      style: TextStyle(color: Colors.grey, fontSize: 12),
+                    ),
+                  ],
                 ),
-                SizedBox(height: 4),
-                Text(
-                  '© 2026 Barcode Billing System',
-                  style: TextStyle(color: Colors.grey, fontSize: 12),
-                ),
-              ],
-            ),
+              ),
+              const SizedBox(height: 16),
+            ],
           ),
-                const SizedBox(height: 16),
-              ],
-            ),
-          );
-        },
-      );
-    }
+        );
+      },
+    );
+  }
 
   void _showUpiDialog(BuildContext context, String currentUpi) {
-    final controller = TextEditingController(text: currentUpi == 'Not Set' ? '' : currentUpi);
+    final controller = TextEditingController(
+      text: currentUpi == 'Not Set' ? '' : currentUpi,
+    );
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -337,10 +373,7 @@ class ProfileScreen extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 4),
-        Text(
-          label,
-          style: const TextStyle(color: Colors.grey, fontSize: 12),
-        ),
+        Text(label, style: const TextStyle(color: Colors.grey, fontSize: 12)),
       ],
     );
   }
@@ -380,14 +413,18 @@ class ProfileScreen extends StatelessWidget {
                       Text(
                         title,
                         style: const TextStyle(
-                            fontWeight: FontWeight.w600, fontSize: 16),
+                          fontWeight: FontWeight.w600,
+                          fontSize: 16,
+                        ),
                       ),
                       if (subtitle != null) ...[
                         const SizedBox(height: 2),
                         Text(
                           subtitle,
-                          style:
-                              const TextStyle(color: Colors.grey, fontSize: 14),
+                          style: const TextStyle(
+                            color: Colors.grey,
+                            fontSize: 14,
+                          ),
                         ),
                       ],
                     ],

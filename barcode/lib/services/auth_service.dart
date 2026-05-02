@@ -50,11 +50,12 @@ class AuthService {
       return _firebaseAuth.signInWithPopup(provider);
     }
 
-    final GoogleSignIn googleSignIn = GoogleSignIn(
+    await GoogleSignIn.instance.initialize(
       serverClientId:
           '571549908150-3j18h1fgrt6ce09ea5bpdov2mas6al00.apps.googleusercontent.com',
     );
-    final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+    final GoogleSignInAccount? googleUser =
+        await GoogleSignIn.instance.authenticate();
 
     if (googleUser == null) {
       throw FirebaseAuthException(
@@ -63,10 +64,16 @@ class AuthService {
       );
     }
 
-    final GoogleSignInAuthentication googleAuth =
-        await googleUser.authentication;
+    final GoogleSignInAuthentication googleAuth = googleUser.authentication;
+    
+    // In v7.x, accessToken must be requested via authorizationClient
+    final authorization = await googleUser.authorizationClient.authorizeScopes([
+      'email',
+      'profile',
+    ]);
+
     final AuthCredential credential = GoogleAuthProvider.credential(
-      accessToken: googleAuth.accessToken,
+      accessToken: authorization.accessToken,
       idToken: googleAuth.idToken,
     );
 
@@ -74,9 +81,9 @@ class AuthService {
   }
 
   Future<void> signOut() async {
-    await Future.wait([
+    await Future.wait<void>([
       _firebaseAuth.signOut(),
-      GoogleSignIn().signOut().catchError((_) {}),
+      GoogleSignIn.instance.signOut().catchError((_) => null),
     ]);
   }
 }

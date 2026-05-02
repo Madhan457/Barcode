@@ -32,27 +32,33 @@ class _MainScreenState extends State<MainScreen> {
         backgroundColor: isDark ? const Color(0xFF1f2937) : Colors.white,
         title: Row(
           children: [
-            Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF3b82f6), Color(0xFF9333ea)],
-                ),
-                borderRadius: BorderRadius.circular(12),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Image.asset(
+                'assets/images/app_logo.jpg',
+                width: 35,
+                height: 35,
+                fit: BoxFit.cover,
               ),
-              child: const Icon(Icons.menu, color: Colors.white),
             ),
             const SizedBox(width: 12),
+            Text(
+              'Quick',
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.w900,
+                color: isDark ? Colors.white : const Color(0xFF000B1A),
+              ),
+            ),
             ShaderMask(
               shaderCallback: (bounds) => const LinearGradient(
-                colors: [Color(0xFF2563eb), Color(0xFF9333ea)],
+                colors: [Color(0xFF84CC16), Color(0xFF06B6D4)],
               ).createShader(bounds),
               child: const Text(
-                'Billing System',
+                'Bill',
                 style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
+                  fontSize: 22,
+                  fontWeight: FontWeight.w900,
                   color: Colors.white,
                 ),
               ),
@@ -116,7 +122,7 @@ class _MainScreenState extends State<MainScreen> {
         decoration: BoxDecoration(
           gradient: isSelected
               ? const LinearGradient(
-                  colors: [Color(0xFF3b82f6), Color(0xFF9333ea)],
+                  colors: [Color(0xFF84CC16), Color(0xFF06B6D4)],
                 )
               : null,
           borderRadius: BorderRadius.circular(16),
