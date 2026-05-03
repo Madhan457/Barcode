@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/theme_provider.dart';
 import 'home_screen.dart';
+import 'items_screen.dart';
 import 'history_screen.dart';
 import 'profile_screen.dart';
 
@@ -17,6 +18,7 @@ class _MainScreenState extends State<MainScreen> {
 
   final List<Widget> _screens = [
     const HomeScreen(),
+    const ItemsScreen(),
     const HistoryScreen(),
     const ProfileScreen(),
   ];
@@ -103,8 +105,9 @@ class _MainScreenState extends State<MainScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 _buildNavItem(Icons.home, 'Home', 0),
-                _buildNavItem(Icons.history, 'History', 1),
-                _buildNavItem(Icons.person, 'Profile', 2),
+                _buildNavItem(Icons.inventory_2, 'Items', 1),
+                _buildNavItem(Icons.history, 'History', 2),
+                _buildNavItem(Icons.person, 'Profile', 3),
               ],
             ),
           ),

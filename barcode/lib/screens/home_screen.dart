@@ -140,10 +140,10 @@ class _HomeScreenState extends State<HomeScreen>
                     ),
                     prefixIcon: const Icon(Icons.currency_rupee),
                   ),
-                  keyboardType: TextInputType.number,
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
                   validator: (value) {
                     if (value == null || value.isEmpty) return 'Please enter MRP';
-                    if (int.tryParse(value) == null) return 'Please enter a valid whole number';
+                    if (double.tryParse(value) == null) return 'Please enter a valid number';
                     return null;
                   },
                 ),
@@ -160,7 +160,7 @@ class _HomeScreenState extends State<HomeScreen>
             onPressed: () async {
               if (formKey.currentState!.validate()) {
                 final name = nameController.text;
-                final mrp = int.parse(mrpController.text);
+                final mrp = double.parse(mrpController.text);
                 
                 try {
                   await FirestoreService().addProduct(

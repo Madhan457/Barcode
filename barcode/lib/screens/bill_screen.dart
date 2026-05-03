@@ -84,10 +84,11 @@ class _BillScreenState extends State<BillScreen> {
               ),
             ],
           ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
                 width: 50,
                 height: 5,
                 decoration: BoxDecoration(
@@ -234,8 +235,9 @@ class _BillScreenState extends State<BillScreen> {
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildUpiAppLogo(String label, String assetPath) {
     return Column(

@@ -77,7 +77,7 @@ class FirestoreService {
   Future<void> addProduct({
     required String barcode,
     required String name,
-    required int mrp,
+    required double mrp,
   }) async {
     final ref = _productsRef;
     if (ref == null) throw Exception('User not authenticated');
@@ -86,6 +86,41 @@ class FirestoreService {
       'mrp': mrp,
       'createdAt': FieldValue.serverTimestamp(),
     });
+  }
+
+  // Fetch all products for the current user
+  Stream<List<Map<String, dynamic>>> getProductsStream() {
+    final ref = _productsRef;
+    if (ref == null) return Stream.value([]);
+    return ref.orderBy('createdAt', descending: true).snapshots().map((snapshot) {
+      return snapshot.docs.map((doc) {
+        final data = doc.data();
+        data['id'] = doc.id; // Include the barcode as id
+        return data;
+      }).toList();
+    });
+  }
+
+  // Update an existing product
+  Future<void> updateProduct({
+    required String barcode,
+    required String name,
+    required double mrp,
+  }) async {
+    final ref = _productsRef;
+    if (ref == null) throw Exception('User not authenticated');
+    await ref.doc(barcode).update({
+      'name': name,
+      'mrp': mrp,
+      'updatedAt': FieldValue.serverTimestamp(),
+    });
+  }
+
+  // Delete a product
+  Future<void> deleteProduct(String barcode) async {
+    final ref = _productsRef;
+    if (ref == null) throw Exception('User not authenticated');
+    await ref.doc(barcode).delete();
   }
 
   Stream<List<BillHistory>> getBillsStream() {
