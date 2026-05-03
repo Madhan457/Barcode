@@ -266,14 +266,10 @@ class _SignupScreenState extends State<SignupScreen> {
                                   color: Colors.white,
                                   shape: BoxShape.circle,
                                 ),
-                                child: const Center(
-                                  child: Text(
-                                    'G',
-                                    style: TextStyle(
-                                      color: Color(0xFF4285F4),
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16,
-                                    ),
+                                child: ClipOval(
+                                  child: Image.asset(
+                                    'assets/images/google_logo.png',
+                                    fit: BoxFit.cover,
                                   ),
                                 ),
                               ),

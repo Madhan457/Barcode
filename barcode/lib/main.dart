@@ -49,7 +49,10 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
       // When app resumes, check if security is required and reset session auth
-      final securityProvider = Provider.of<SecurityProvider>(context, listen: false);
+      final securityProvider = Provider.of<SecurityProvider>(
+        context,
+        listen: false,
+      );
       if (securityProvider.requireSecurityOnEntry) {
         securityProvider.resetAuthentication();
       }
@@ -98,12 +101,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
               '/privacy_security': (context) => const PrivacySecurityScreen(),
             },
             builder: (context, child) {
-              return Stack(
-                children: [
-                  child!,
-                  const NotificationOverlay(),
-                ],
-              );
+              return Stack(children: [child!, const NotificationOverlay()]);
             },
           );
         },
@@ -130,7 +128,8 @@ class AuthGate extends StatelessWidget {
         }
 
         // Check if security lock is enabled and user is not yet authenticated for this session
-        if (securityProvider.requireSecurityOnEntry && !securityProvider.isAuthenticated) {
+        if (securityProvider.requireSecurityOnEntry &&
+            !securityProvider.isAuthenticated) {
           return const SecurityLockScreen();
         }
 
@@ -148,7 +147,10 @@ class SecurityLockScreen extends StatefulWidget {
 }
 
 class _SecurityLockScreenState extends State<SecurityLockScreen> {
-  final List<TextEditingController> _controllers = List.generate(4, (_) => TextEditingController());
+  final List<TextEditingController> _controllers = List.generate(
+    4,
+    (_) => TextEditingController(),
+  );
   final List<FocusNode> _focusNodes = List.generate(4, (_) => FocusNode());
   bool _isBiometricAuthenticated = false;
   bool _isPinAuthenticated = false;
@@ -164,7 +166,7 @@ class _SecurityLockScreenState extends State<SecurityLockScreen> {
   Future<void> _startBiometricAuth() async {
     final security = context.read<SecurityProvider>();
     if (!security.isBiometricEnabled) return;
-    
+
     final success = await security.authenticateBiometrics();
     if (success) {
       setState(() => _isBiometricAuthenticated = true);
@@ -175,11 +177,11 @@ class _SecurityLockScreenState extends State<SecurityLockScreen> {
   void _unlockApp() {
     context.read<SecurityProvider>().setAuthenticated(true);
     context.read<NotificationProvider>().showNotification(
-          title: 'Welcome Back',
-          message: 'Authentication successful',
-          icon: Icons.verified_user,
-          color: Colors.green,
-        );
+      title: 'Welcome Back',
+      message: 'Authentication successful',
+      icon: Icons.verified_user,
+      color: Colors.green,
+    );
   }
 
   void _onPinChanged(int index, String value) {
@@ -207,7 +209,10 @@ class _SecurityLockScreenState extends State<SecurityLockScreen> {
       }
       _focusNodes[0].requestFocus();
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Incorrect PIN'), backgroundColor: Colors.red),
+        const SnackBar(
+          content: Text('Incorrect PIN'),
+          backgroundColor: Colors.red,
+        ),
       );
     }
   }
@@ -251,10 +256,7 @@ class _SecurityLockScreenState extends State<SecurityLockScreen> {
                 const SizedBox(height: 32),
                 const Text(
                   'Quick Bill Secure Entry',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 8),
                 Text(
@@ -264,7 +266,7 @@ class _SecurityLockScreenState extends State<SecurityLockScreen> {
                   style: const TextStyle(color: Colors.grey),
                 ),
                 const SizedBox(height: 48),
-                
+
                 // PIN Input
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -281,29 +283,39 @@ class _SecurityLockScreenState extends State<SecurityLockScreen> {
                         textAlign: TextAlign.center,
                         maxLength: 1,
                         obscureText: true,
-                        style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                        style: const TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
                         decoration: InputDecoration(
                           counterText: '',
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: BorderSide(
-                              color: isDark ? const Color(0xFF374151) : const Color(0xFFe5e7eb),
+                              color: isDark
+                                  ? const Color(0xFF374151)
+                                  : const Color(0xFFe5e7eb),
                             ),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
-                            borderSide: const BorderSide(color: Color(0xFF06B6D4), width: 2),
+                            borderSide: const BorderSide(
+                              color: Color(0xFF06B6D4),
+                              width: 2,
+                            ),
                           ),
-                          fillColor: isDark ? const Color(0xFF1f2937) : Colors.white,
+                          fillColor: isDark
+                              ? const Color(0xFF1f2937)
+                              : Colors.white,
                           filled: true,
                         ),
                       ),
                     );
                   }),
                 ),
-                
+
                 const SizedBox(height: 48),
-                
+
                 // Fingerprint Button
                 if (securityProvider.isBiometricEnabled)
                   InkWell(
@@ -312,27 +324,39 @@ class _SecurityLockScreenState extends State<SecurityLockScreen> {
                     child: Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: _isBiometricAuthenticated ? Colors.green.withValues(alpha: 0.1) : Colors.transparent,
+                        color: _isBiometricAuthenticated
+                            ? Colors.green.withValues(alpha: 0.1)
+                            : Colors.transparent,
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: _isBiometricAuthenticated ? Colors.green : const Color(0xFF06B6D4),
+                          color: _isBiometricAuthenticated
+                              ? Colors.green
+                              : const Color(0xFF06B6D4),
                           width: 2,
                         ),
                       ),
                       child: Icon(
-                        _isBiometricAuthenticated ? Icons.check : Icons.fingerprint,
+                        _isBiometricAuthenticated
+                            ? Icons.check
+                            : Icons.fingerprint,
                         size: 48,
-                        color: _isBiometricAuthenticated ? Colors.green : const Color(0xFF06B6D4),
+                        color: _isBiometricAuthenticated
+                            ? Colors.green
+                            : const Color(0xFF06B6D4),
                       ),
                     ),
                   ),
-                
+
                 const SizedBox(height: 16),
                 if (securityProvider.isBiometricEnabled)
                   Text(
-                    _isBiometricAuthenticated ? 'Fingerprint Verified' : 'Scan Fingerprint',
+                    _isBiometricAuthenticated
+                        ? 'Fingerprint Verified'
+                        : 'Scan Fingerprint',
                     style: TextStyle(
-                      color: _isBiometricAuthenticated ? Colors.green : const Color(0xFF06B6D4),
+                      color: _isBiometricAuthenticated
+                          ? Colors.green
+                          : const Color(0xFF06B6D4),
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -385,7 +409,10 @@ class NotificationOverlay extends StatelessWidget {
                 );
               },
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
                 decoration: BoxDecoration(
                   color: Theme.of(context).brightness == Brightness.dark
                       ? const Color(0xFF1f2937)
@@ -410,7 +437,11 @@ class NotificationOverlay extends StatelessWidget {
                         color: notification.color.withValues(alpha: 0.1),
                         shape: BoxShape.circle,
                       ),
-                      child: Icon(notification.icon, color: notification.color, size: 20),
+                      child: Icon(
+                        notification.icon,
+                        color: notification.color,
+                        size: 20,
+                      ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
@@ -436,7 +467,11 @@ class NotificationOverlay extends StatelessWidget {
                       ),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.close, size: 18, color: Colors.grey),
+                      icon: const Icon(
+                        Icons.close,
+                        size: 18,
+                        color: Colors.grey,
+                      ),
                       onPressed: provider.hideNotification,
                     ),
                   ],
