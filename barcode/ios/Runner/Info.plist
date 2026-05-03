@@ -68,5 +68,7 @@
 	</array>
 	<key>NSCameraUsageDescription</key>
 	<string>This app needs camera access to scan barcodes</string>
+	<key>NSFaceIDUsageDescription</key>
+	<string>This app uses Face ID to secure your account and billing data.</string>
 </dict>
 </plist>

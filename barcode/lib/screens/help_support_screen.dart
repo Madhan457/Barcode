@@ -129,24 +129,12 @@ class HelpSupportScreen extends StatelessWidget {
             style: TextStyle(color: Colors.white70, fontSize: 14),
           ),
           const SizedBox(height: 24),
-          Row(
-            children: [
-              Expanded(
-                child: _buildContactButton(
-                  icon: Icons.email_outlined,
-                  label: 'Email',
-                  onTap: () {},
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _buildContactButton(
-                  icon: Icons.chat_bubble_outline,
-                  label: 'Live Chat',
-                  onTap: () {},
-                ),
-              ),
-            ],
+          Center(
+            child: _buildContactButton(
+              icon: Icons.email_outlined,
+              label: 'Email: innovexa.techno@gmail.com',
+              onTap: () {},
+            ),
           ),
         ],
       ),
