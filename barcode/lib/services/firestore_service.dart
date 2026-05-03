@@ -56,9 +56,17 @@ class FirestoreService {
     }, SetOptions(merge: true));
   }
 
+  CollectionReference<Map<String, dynamic>>? get _productsRef {
+    final uid = _userId;
+    if (uid == null) return null;
+    return _db.collection('users').doc(uid).collection('products');
+  }
+
   // Fetch product details by barcode ID
   Future<Map<String, dynamic>?> getProductByBarcode(String barcode) async {
-    final doc = await _db.collection('products').doc(barcode).get();
+    final ref = _productsRef;
+    if (ref == null) return null;
+    final doc = await ref.doc(barcode).get();
     if (doc.exists) {
       return doc.data();
     }
@@ -71,7 +79,9 @@ class FirestoreService {
     required String name,
     required int mrp,
   }) async {
-    await _db.collection('products').doc(barcode).set({
+    final ref = _productsRef;
+    if (ref == null) throw Exception('User not authenticated');
+    await ref.doc(barcode).set({
       'name': name,
       'mrp': mrp,
       'createdAt': FieldValue.serverTimestamp(),
