@@ -1,12 +1,17 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:printing/printing.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:path_provider/path_provider.dart';
 import '../providers/cart_provider.dart';
 import '../providers/theme_provider.dart';
 import '../models/bill_history.dart';
 import '../services/firestore_service.dart';
 import '../services/notification_service.dart';
+import '../services/pdf_service.dart';
 
 class BillScreen extends StatefulWidget {
   const BillScreen({super.key});
@@ -18,6 +23,7 @@ class BillScreen extends StatefulWidget {
 class _BillScreenState extends State<BillScreen> {
   bool _isPaymentFinished = false;
   bool _isProcessing = false;
+  BillHistory? _completedBill;
 
   Future<void> _completeBilling(
       List<dynamic> items, double total, int totalItems) async {
@@ -37,6 +43,7 @@ class _BillScreenState extends State<BillScreen> {
       setState(() {
         _isPaymentFinished = true;
         _isProcessing = false;
+        _completedBill = bill;
       });
     } catch (e) {
       setState(() => _isProcessing = false);
@@ -44,6 +51,57 @@ class _BillScreenState extends State<BillScreen> {
         NotificationService.showTopNotification(
           context,
           'Error saving bill: $e',
+          isError: true,
+        );
+      }
+    }
+  }
+
+  Future<void> _handlePrint(BuildContext context) async {
+    if (_completedBill == null) return;
+
+    try {
+      final userData = await FirestoreService().getUserDataStream().first;
+      final pdfBytes =
+          await PdfService.generateBillPdf(_completedBill!, userData);
+
+      await Printing.layoutPdf(
+        onLayout: (format) async => pdfBytes,
+        name: 'Bill_${_completedBill!.id}.pdf',
+      );
+    } catch (e) {
+      if (mounted) {
+        NotificationService.showTopNotification(
+          context,
+          'Error generating PDF: $e',
+          isError: true,
+        );
+      }
+    }
+  }
+
+  Future<void> _handleShare(BuildContext context) async {
+    if (_completedBill == null) return;
+
+    try {
+      final userData = await FirestoreService().getUserDataStream().first;
+      final pdfBytes =
+          await PdfService.generateBillPdf(_completedBill!, userData);
+
+      final tempDir = await getTemporaryDirectory();
+      final file = File('${tempDir.path}/Bill_${_completedBill!.id}.pdf');
+      await file.writeAsBytes(pdfBytes);
+
+      await Share.shareXFiles(
+        [XFile(file.path)],
+        subject: 'Bill from Quick Bill - ${_completedBill!.id}',
+        text: 'Sharing receipt for Bill ${_completedBill!.id}',
+      );
+    } catch (e) {
+      if (mounted) {
+        NotificationService.showTopNotification(
+          context,
+          'Error sharing PDF: $e',
           isError: true,
         );
       }
@@ -284,8 +342,7 @@ class _BillScreenState extends State<BillScreen> {
     final totalItems = items.fold(0, (sum, item) => sum + item.quantity);
     final subtotal =
         items.fold(0.0, (sum, item) => sum + (item.price * item.quantity));
-    final tax = subtotal * 0.05;
-    final total = subtotal + tax;
+    final total = subtotal;
     final billNumber =
         '#${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}';
     final now = DateTime.now();
@@ -464,45 +521,26 @@ class _BillScreenState extends State<BillScreen> {
 
                                 const Divider(height: 32, thickness: 2),
 
-                                // Totals
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    const Text('Subtotal'),
-                                    Text('₹${subtotal.toStringAsFixed(2)}'),
-                                  ],
-                                ),
-                                const SizedBox(height: 8),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    const Text('Tax (5%)'),
-                                    Text('₹${tax.toStringAsFixed(2)}'),
-                                  ],
-                                ),
-                                const Divider(height: 24),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    const Text(
-                                      'Total',
-                                      style: TextStyle(
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    Text(
-                                      '₹${total.toStringAsFixed(2)}',
-                                      style: const TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
-                                        color: Color(0xFF06B6D4),
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                                 Row(
+                                   mainAxisAlignment:
+                                       MainAxisAlignment.spaceBetween,
+                                   children: [
+                                     const Text(
+                                       'Total',
+                                       style: TextStyle(
+                                           fontSize: 20,
+                                           fontWeight: FontWeight.bold),
+                                     ),
+                                     Text(
+                                       '₹${total.toStringAsFixed(2)}',
+                                       style: const TextStyle(
+                                         fontSize: 20,
+                                         fontWeight: FontWeight.bold,
+                                         color: Color(0xFF06B6D4),
+                                       ),
+                                     ),
+                                   ],
+                                 ),
 
                                 const SizedBox(height: 24),
 
@@ -609,7 +647,7 @@ class _BillScreenState extends State<BillScreen> {
                                           Icons.print,
                                           'Print',
                                           const Color(0xFF3b82f6),
-                                          () {},
+                                          () => _handlePrint(context),
                                         ),
                                       ),
                                       const SizedBox(width: 12),
@@ -618,7 +656,7 @@ class _BillScreenState extends State<BillScreen> {
                                           Icons.share,
                                           'Share',
                                           const Color(0xFF10b981),
-                                          () {},
+                                          () => _handleShare(context),
                                         ),
                                       ),
                                     ],
