@@ -234,11 +234,7 @@ class ProfileScreen extends StatelessWidget {
                       subtitle: 'Enabled',
                       color: const Color(0xFF9333ea),
                       onTap: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Notifications settings'),
-                          ),
-                        );
+                        Navigator.pushNamed(context, '/notifications');
                       },
                     ),
                     _buildSettingItem(
@@ -246,11 +242,7 @@ class ProfileScreen extends StatelessWidget {
                       title: 'Help & Support',
                       color: const Color(0xFF10b981),
                       onTap: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Help center coming soon'),
-                          ),
-                        );
+                        Navigator.pushNamed(context, '/help_support');
                       },
                     ),
                     _buildSettingItem(
@@ -258,9 +250,7 @@ class ProfileScreen extends StatelessWidget {
                       title: 'Privacy & Security',
                       color: const Color(0xFFf59e0b),
                       onTap: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Privacy settings')),
-                        );
+                        Navigator.pushNamed(context, '/privacy_security');
                       },
                       isLast: true,
                     ),

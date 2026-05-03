@@ -11,6 +11,9 @@ import 'screens/login_screen.dart';
 import 'screens/main_screen.dart';
 import 'screens/signup_screen.dart';
 import 'services/auth_service.dart';
+import 'screens/notifications_screen.dart';
+import 'screens/help_support_screen.dart';
+import 'screens/privacy_security_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -58,6 +61,9 @@ class MyApp extends StatelessWidget {
               '/signup': (context) => const SignupScreen(),
               '/main': (context) => const MainScreen(),
               '/bill': (context) => const BillScreen(),
+              '/notifications': (context) => const NotificationsScreen(),
+              '/help_support': (context) => const HelpSupportScreen(),
+              '/privacy_security': (context) => const PrivacySecurityScreen(),
             },
           );
         },
