@@ -5,6 +5,7 @@ import '../providers/cart_provider.dart';
 import '../providers/theme_provider.dart';
 import '../models/cart_item.dart';
 import '../services/firestore_service.dart';
+import '../services/notification_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -47,13 +48,8 @@ class _HomeScreenState extends State<HomeScreen>
 
     setState(() => _isProcessing = true);
 
-    // Show scanned code in Snackbar
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Scanned: $code'),
-        duration: const Duration(seconds: 1),
-      ),
-    );
+    // Show scanned code in top notification
+    NotificationService.showTopNotification(context, 'Scanned: $code');
 
     try {
       final productData = await FirestoreService().getProductByBarcode(code);
@@ -181,11 +177,9 @@ class _HomeScreenState extends State<HomeScreen>
                     );
                   });
                   
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Added "$name" to database'),
-                      backgroundColor: Colors.green,
-                    ),
+                  NotificationService.showTopNotification(
+                    context,
+                    'Added "$name" to database',
                   );
                 } catch (e) {
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -415,8 +409,12 @@ class _HomeScreenState extends State<HomeScreen>
                     onPressed: () => Navigator.pushNamed(context, '/bill'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF06B6D4),
+                      foregroundColor: Colors.white,
                     ),
-                    child: const Text('Finish Billing'),
+                    child: const Text(
+                      'Finish Billing',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
                   ),
                 ),
               ],
@@ -575,12 +573,11 @@ class _HomeScreenState extends State<HomeScreen>
               onPressed: () {
                 cartProvider.addItem(_currentProduct!);
                 setState(() => _currentProduct = null);
-                ScaffoldMessenger.of(
-                  context,
-                ).showSnackBar(const SnackBar(content: Text('Added to cart')));
+                NotificationService.showTopNotification(context, 'Added to cart');
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.blue,
+                foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),

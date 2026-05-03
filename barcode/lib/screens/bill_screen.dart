@@ -6,6 +6,7 @@ import '../providers/cart_provider.dart';
 import '../providers/theme_provider.dart';
 import '../models/bill_history.dart';
 import '../services/firestore_service.dart';
+import '../services/notification_service.dart';
 
 class BillScreen extends StatefulWidget {
   const BillScreen({super.key});
@@ -40,8 +41,10 @@ class _BillScreenState extends State<BillScreen> {
     } catch (e) {
       setState(() => _isProcessing = false);
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error saving bill: $e')),
+        NotificationService.showTopNotification(
+          context,
+          'Error saving bill: $e',
+          isError: true,
         );
       }
     }
@@ -54,9 +57,10 @@ class _BillScreenState extends State<BillScreen> {
 
     if (upiId == null || upiId == 'Not Set') {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('Please set your UPI ID in Profile first')),
+      NotificationService.showTopNotification(
+        context,
+        'Please set your UPI ID in Profile first',
+        isError: true,
       );
       return;
     }
@@ -167,9 +171,7 @@ class _BillScreenState extends State<BillScreen> {
                           GestureDetector(
                             onTap: () {
                               Clipboard.setData(ClipboardData(text: upiId));
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('UPI ID copied to clipboard')),
-                              );
+                                NotificationService.showTopNotification(context, 'UPI ID copied to clipboard');
                             },
                             child: const Icon(Icons.copy, size: 16, color: Colors.blue),
                           ),
@@ -554,6 +556,7 @@ class _BillScreenState extends State<BillScreen> {
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor:
                                             const Color(0xFF06B6D4),
+                                        foregroundColor: Colors.white,
                                         shape: RoundedRectangleBorder(
                                           borderRadius:
                                               BorderRadius.circular(16),
@@ -565,7 +568,7 @@ class _BillScreenState extends State<BillScreen> {
                                   SizedBox(
                                     width: double.infinity,
                                     height: 56,
-                                    child: OutlinedButton.icon(
+                                    child: ElevatedButton.icon(
                                       onPressed: _isProcessing
                                           ? null
                                           : () => _completeBilling(
@@ -577,15 +580,15 @@ class _BillScreenState extends State<BillScreen> {
                                             fontSize: 18,
                                             fontWeight: FontWeight.bold),
                                       ),
-                                      style: OutlinedButton.styleFrom(
-                                        side: const BorderSide(
-                                            color: Color(0xFF84CC16), width: 2),
-                                        foregroundColor:
-                                            const Color(0xFF84CC16),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: const Color(0xFF10b981),
+                                        foregroundColor: Colors.white,
                                         shape: RoundedRectangleBorder(
                                           borderRadius:
                                               BorderRadius.circular(16),
                                         ),
+                                        elevation: 8,
+                                        shadowColor: const Color(0xFF10b981).withValues(alpha: 0.5),
                                       ),
                                     ),
                                   ),
@@ -633,6 +636,7 @@ class _BillScreenState extends State<BillScreen> {
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor:
                                             const Color(0xFF10b981),
+                                        foregroundColor: Colors.white,
                                         shape: RoundedRectangleBorder(
                                           borderRadius:
                                               BorderRadius.circular(16),

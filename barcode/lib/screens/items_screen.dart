@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import '../services/firestore_service.dart';
+import '../services/notification_service.dart';
 import '../providers/theme_provider.dart';
 
 class ItemsScreen extends StatefulWidget {
@@ -227,8 +228,9 @@ class _ItemsScreenState extends State<ItemsScreen> {
                     );
                   }
                   if (mounted) Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Item ${isEditing ? 'updated' : 'added'}')),
+                  NotificationService.showTopNotification(
+                    context,
+                    'Item ${isEditing ? 'updated' : 'added'}',
                   );
                 } catch (e) {
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -237,8 +239,11 @@ class _ItemsScreenState extends State<ItemsScreen> {
                 }
               }
             },
-            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF06B6D4)),
-            child: Text(isEditing ? 'Update' : 'Add', style: const TextStyle(color: Colors.white)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF06B6D4),
+              foregroundColor: Colors.white,
+            ),
+            child: Text(isEditing ? 'Update' : 'Add', style: const TextStyle(fontWeight: FontWeight.bold)),
           ),
         ],
       ),
@@ -288,18 +293,19 @@ class _ItemsScreenState extends State<ItemsScreen> {
             onPressed: () async {
               try {
                 await _firestoreService.deleteProduct(barcode);
-                if (mounted) Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Item deleted')),
-                );
+                  if (mounted) Navigator.pop(context);
+                  NotificationService.showTopNotification(context, 'Item deleted');
               } catch (e) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text('Error: $e')),
                 );
               }
             },
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text('Delete', style: TextStyle(color: Colors.white)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Delete', style: TextStyle(fontWeight: FontWeight.bold)),
           ),
         ],
       ),
