@@ -90,12 +90,66 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   void _showAddProductDialog(String barcode) {
+    final nameController = TextEditingController();
+    final mrpController = TextEditingController();
+    final formKey = GlobalKey<FormState>();
+
     showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (context) => AlertDialog(
         title: const Text('Product Not Found'),
-        content: Text(
-          'Barcode $barcode is not in our database. Would you like to add it?',
+        content: SingleChildScrollView(
+          child: Form(
+            key: formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Barcode: $barcode',
+                  style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.blue),
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  'This product is not in our database. Please enter details to add it.',
+                  style: TextStyle(fontSize: 12, color: Colors.grey),
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: nameController,
+                  decoration: InputDecoration(
+                    labelText: 'Product Name',
+                    hintText: 'Enter product name',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    prefixIcon: const Icon(Icons.shopping_bag_outlined),
+                  ),
+                  validator: (value) =>
+                      value == null || value.isEmpty ? 'Please enter product name' : null,
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: mrpController,
+                  decoration: InputDecoration(
+                    labelText: 'MRP (₹)',
+                    hintText: 'Enter price',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    prefixIcon: const Icon(Icons.currency_rupee),
+                  ),
+                  keyboardType: TextInputType.number,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) return 'Please enter MRP';
+                    if (int.tryParse(value) == null) return 'Please enter a valid whole number';
+                    return null;
+                  },
+                ),
+              ],
+            ),
+          ),
         ),
         actions: [
           TextButton(
@@ -103,11 +157,51 @@ class _HomeScreenState extends State<HomeScreen>
             child: const Text('Cancel'),
           ),
           ElevatedButton(
-            onPressed: () {
-              // Navigation to an add product screen could go here
-              Navigator.pop(context);
+            onPressed: () async {
+              if (formKey.currentState!.validate()) {
+                final name = nameController.text;
+                final mrp = int.parse(mrpController.text);
+                
+                try {
+                  await FirestoreService().addProduct(
+                    barcode: barcode,
+                    name: name,
+                    mrp: mrp,
+                  );
+                  
+                  if (!mounted) return;
+                  Navigator.pop(context);
+                  
+                  setState(() {
+                    _currentProduct = CartItem(
+                      id: barcode,
+                      name: name,
+                      price: mrp.toDouble(),
+                      quantity: 1,
+                    );
+                  });
+                  
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Added "$name" to database'),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Error adding product: $e'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              }
             },
-            child: const Text('Add Product'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF06B6D4),
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Save & Select'),
           ),
         ],
       ),

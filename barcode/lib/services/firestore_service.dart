@@ -65,6 +65,19 @@ class FirestoreService {
     return null;
   }
 
+  // Add a new product to the database
+  Future<void> addProduct({
+    required String barcode,
+    required String name,
+    required int mrp,
+  }) async {
+    await _db.collection('products').doc(barcode).set({
+      'name': name,
+      'mrp': mrp,
+      'createdAt': FieldValue.serverTimestamp(),
+    });
+  }
+
   Stream<List<BillHistory>> getBillsStream() {
     final ref = _billsRef;
     if (ref == null) return Stream.value([]);
